@@ -80,7 +80,7 @@ class Holidays
     /**
      * @param DateTime $day
      */
-    private function isFixedHolidays(DateTime $day)
+    protected function isFixedHolidays(DateTime $day)
     {
         $isDayOff = false;
         $extractedMonthAndDay = $day->format('m-d');
