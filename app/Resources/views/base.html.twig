@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Billets du Louvre</title>
+    <link rel="icon" type="image/x-icon" href="{{ asset('favicon.ico') }}">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css" integrity="sha512-dTfge/zgoMYpP7QbHy4gWMEGsbsdZeCXz7irItjcC3sPUFtf0kuFbDz/ixG7ArTxmDjLXDmezHubeNikyKGVyQ==" crossorigin="anonymous">
+    <link rel="stylesheet" href="{{ asset('css/common.css') }}">
+    <script src="//code.jquery.com/jquery-1.11.3.min.js"></script>
+    {% block stylesheets %}{% endblock %}
+</head>
+<body class="container-fluid">
+    <header class="navbar-fixed-top text-center">
+        <img class="pull-left hidden-xs hidden-sm" src="{{ asset('images/logo-louvre.jpg') }}" alt="Le louvre" />
+        <h1>Billets du Louvre</h1>
+    </header>
+    <img id="background" class="hidden-xs hidden-sm" src="{{ asset('images/background-louvre.png') }}" />
+    <div class="row hidden-xs hidden-sm">
+        <div class="vertical-spacer"></div>
+    </div>
+    <div id="content" class="row">
+        {% block content %}{% endblock %}
+    </div>
+    <footer class="navbar-fixed-bottom text-center">
+        <p>copyright Jean Friry <span class="hidden-xs"> - Visitez le <a href="http://www.louvre.fr">site du Louvre</a></span></p>
+    </footer>
+    {% block javascripts %}{% endblock %}
+</body>
+</html>

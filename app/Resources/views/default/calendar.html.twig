@@ -1,0 +1,35 @@
+{% extends 'baseWithSidebar.html.twig' %}
+
+{% block stylesheets %}
+    {%  stylesheets '@FrjCalendarBundle/Resources/css/style.css' filter="cssrewrite" %}
+        <link rel="stylesheet" href="{{ asset_url }}" />
+    {% endstylesheets %}
+{% endblock %}
+
+{% block container %}
+    <div id="steps" class="visible-lg row">
+
+    </div>
+    <div class="row">
+        <h2 class="text-center">Date de la visite</h2>
+    </div>
+    <div class="row">
+        <div id="calendar" class="col-xs-12 col-sm-10 col-sm-offset-1">
+            {{ calendar.display|raw }}
+        </div>
+    </div>
+    <div class="row">
+        <div class="hidden-xs col-sm-1"></div>
+        <a class="btn btn-primary col-xs-4 col-sm-2" href="#">Précédent</a>
+        <div class="hidden-xs col-sm-2"></div>
+        <a class="btn btn-danger col-xs-4 col-sm-2" href="#">Annuler</a>
+        <div class="hidden-xs col-sm-2"></div>
+        <a  class="btn btn-primary col-xs-4 col-sm-2" href="#">Suivant</a>
+        <div class="hidden-xs col-sm-1"></div>
+    </div>
+
+{% endblock %}
+
+{% block sidebar %}
+    <h2 class="text-center">Résumé de la commande</h2>
+{% endblock %}

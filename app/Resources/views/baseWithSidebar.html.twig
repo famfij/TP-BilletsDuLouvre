@@ -1,0 +1,12 @@
+{% extends 'base.html.twig' %}
+
+{% block content %}
+    <div class="row col-wrap">
+        <div id="container" class="col-sm-12 col-md-7 col-md-offset-1 col">
+            {% block container %}{% endblock %}
+        </div>
+        <div id="sidebar" class="hidden-xs col-sm-12 col-md-3 col">
+            {% block sidebar %}{% endblock %}
+        </div>
+    </div>
+{% endblock %}

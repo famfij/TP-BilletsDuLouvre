@@ -1,0 +1,12 @@
+# This file is auto-generated during the composer install
+parameters:
+    database_host: 127.0.0.1
+    database_port: '3306'
+    database_name: kzya_billetsdulouvre
+    database_user: kzya_louvre
+    database_password: mdp_Louvre
+    mailer_transport: smtp
+    mailer_host: mail.infomaniak.ch
+    mailer_user: webmaster@famfij.net
+    mailer_password: 1pfwma
+    secret: d3044913a7afa11088b2f78098ed45dbd

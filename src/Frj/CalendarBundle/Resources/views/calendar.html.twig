@@ -1,0 +1,20 @@
+<div id="calendar_container" class="row">
+    <div id="calendar_header" class="col-xs-12 text-center">
+        <button id="calendar_previous" class="pull-left"><span class="glyphicon glyphicon-arrow-left"></span></button>
+        <span id="calendar_month">{{ date()|date('F Y') }}</span>
+        <button id="calendar_next" class="pull-right"><span class="glyphicon glyphicon-arrow-right"></span></button>
+    </div>
+    <div class="col-xs-12">
+        {% for day_key, day_label in day_labels %}<div class="calendar_day_label{% if day_key in days_off %} calendar_disable_day{% endif %}">{{ day_label }}</div>{% endfor %}
+    </div>
+    <div id="calendar_days" class="col-xs-12">
+        {% for day in 0..34 %}<div id="calendar_day_{{ day }}" class="calendar_day{% if day%7+1 not in days_off %} calendar_enable_day{% endif %}"></div>{% endfor %}
+    </div>
+    <div class="col-xs-12 text-center">
+        <button id="calendar_today" class="btn btn-default">Revenir à Aujourd'hui</button>
+    </div>
+</div>
+
+{% javascripts '@FrjCalendarBundle/Resources/js/calendar.js' %}
+    <script src="{{ asset_url }}"></script>
+{% endjavascripts %}

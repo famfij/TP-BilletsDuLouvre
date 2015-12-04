@@ -1,0 +1,13 @@
+{% extends 'base.html.twig' %}
+
+{% block content %}
+    <div class="col-xs-12 col-md-8 col-md-offset-2">
+        <div id="container" class="text-center">
+            <p>Ce site vous permet de réserver des billets pour le Louvre.
+                Les billets achetés vous sont par e-mail.
+                Le processus de commande permet les paiements Paypal et CB.
+            </p>
+            <a class="btn btn-primary" href="{{ path('calendar') }}">Commander</a>
+        </div>
+    </div>
+{% endblock %}
