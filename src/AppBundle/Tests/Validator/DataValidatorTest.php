@@ -10,11 +10,8 @@ namespace AppBundle\Tests\Validator;
 
 use AppBundle\Entity\TicketDetail;
 use AppBundle\Entity\TicketsOrder;
-use AppBundle\Entity\Visitor;
 use AppBundle\Validator\DataValidator;
 use Doctrine\Common\Persistence\ObjectManager;
-use Doctrine\ORM\EntityManager;
-use Symfony\Component\Config\Definition\Exception\Exception;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 
 class DataValidatorTest extends \PHPUnit_Framework_TestCase
@@ -199,21 +196,20 @@ class DataValidatorTest extends \PHPUnit_Framework_TestCase
 
     public function testValidateOrder()
     {
-
-    }
-
-    public function testValidateTicketDetail()
-    {
         $ticketsOrder = new TicketsOrder();
 
         $ticketsOrderRepository = $this->getMockBuilder(TicketsOrderRepository::class)
             ->disableOriginalConstructor()
+            ->setMethods(array('getOrderContainingTicketDetailAndRef'))
             ->getMock();
-        $ticketsOrderRepository
+        $ticketsOrderRepository->expects($this->at(0))
             ->method('getOrderContainingTicketDetailAndRef')
             ->will($this->returnValue($ticketsOrder));
+        $ticketsOrderRepository->expects($this->at(1))
+            ->method('getOrderContainingTicketDetailAndRef')
+            ->will($this->returnValue(null));
 
-        $this->entityManager
+        $this->entityManager->expects($this->any())
             ->method('getRepository')
             ->will($this->returnValue($ticketsOrderRepository));
 
@@ -226,12 +222,44 @@ class DataValidatorTest extends \PHPUnit_Framework_TestCase
             $this->fail('Must not throw an exception');
         }
 
-        $ticketsOrderRepository->expects($this->once())
-            ->method('getOrderContainingTicketDetailAndRef')
-            ->will($this->returnValue(null));
-
         try {
             $result = $this->dataValidator->validateOrder('AZERTYUIOPQSDFGH', new TicketDetail());
+            $this->fail('Must throw an exception');
+        } catch (HttpException $e) {
+            $this->assertEquals(400, $e->getStatusCode());
+        }
+    }
+
+    public function testValidateTicketDetail()
+    {
+        $ticketsDetail = new TicketDetail();
+
+        $ticketDetailRepository = $this->getMockBuilder(TicketDetailRepository::class)
+            ->disableOriginalConstructor()
+            ->setMethods(array('find'))
+            ->getMock();
+        $ticketDetailRepository->expects($this->at(0))
+            ->method('find')
+            ->will($this->returnValue($ticketsDetail));
+        $ticketDetailRepository->expects($this->at(1))
+            ->method('find')
+            ->will($this->returnValue(null));
+
+        $this->entityManager->expects($this->any())
+            ->method('getRepository')
+            ->will($this->returnValue($ticketDetailRepository));
+
+        try {
+            $this->assertTrue(
+                $this->dataValidator->validateTicketDetail(1)
+                instanceof TicketDetail
+            );
+        } catch (HttpException $e) {
+            $this->fail('Must not throw an exception');
+        }
+
+        try {
+            $result = $this->dataValidator->validateTicketDetail(1);
             $this->fail('Must throw an exception');
         } catch (HttpException $e) {
             $this->assertEquals(400, $e->getStatusCode());
