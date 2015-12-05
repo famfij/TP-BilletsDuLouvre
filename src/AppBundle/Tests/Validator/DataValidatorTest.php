@@ -13,10 +13,12 @@ use AppBundle\Entity\TicketsOrder;
 use AppBundle\Validator\DataValidator;
 use Doctrine\Common\Persistence\ObjectManager;
 use Symfony\Component\HttpKernel\Exception\HttpException;
+use Ufib\HolidaysBundle\Holidays\Holidays;
 
 class DataValidatorTest extends \PHPUnit_Framework_TestCase
 {
     protected $entityManager;
+    protected $holidays;
     protected $dataValidator;
 
     protected function setUp()
@@ -25,16 +27,129 @@ class DataValidatorTest extends \PHPUnit_Framework_TestCase
             ->getMockBuilder(ObjectManager::class)
             ->disableOriginalConstructor()
             ->getMock();
-        $this->dataValidator = new DataValidator($this->entityManager);
+
+        $this->holidays = $this
+            ->getMockBuilder(Holidays::class)
+            ->getMock();
+        $this->dataValidator = new DataValidator($this->entityManager, $this->holidays);
     }
+
     public function testControlDateValidity()
     {
+        $this->holidays->expects($this->at(0))
+            ->method('isDayOff')
+            ->will($this->returnValue(false));
+        $this->holidays->expects($this->at(1))
+            ->method('isDayOff')
+            ->will($this->returnValue(true));
 
+        try {
+            $visitDate = new \DateTime();
+            $this->dataValidator->controlDateValidity($visitDate);
+        } catch (HttpException $e) {
+            $this->fail('Must not throw Exception');
+        }
+
+        try {
+            $this->dataValidator->controlDateValidity($visitDate);
+            $this->fail('Must throw an Exception');
+        } catch (HttpException $e) {
+            $this->assertEquals('409', $e->getStatusCode());
+            $this->assertStringStartsWith('The date is not valid', $e->getMessage());
+        }
+
+        $this->holidays->expects($this->at(0))
+            ->method('isDayOff')
+            ->will($this->returnValue(false));
+        $this->holidays->expects($this->at(1))
+            ->method('isDayOff')
+            ->will($this->returnValue(true));
+
+        $visitDate->add(new \DateInterval('P20D'));
+        try {
+            $this->dataValidator->controlDateValidity($visitDate);
+        } catch (HttpException $e) {
+            $this->fail('Must not throw Exception');
+        }
+
+        try {
+            $this->dataValidator->controlDateValidity($visitDate);
+            $this->fail('Must throw an Exception');
+        } catch (HttpException $e) {
+            $this->assertEquals('409', $e->getStatusCode());
+            $this->assertStringStartsWith('The date is not valid', $e->getMessage());
+        }
+
+        $this->holidays->expects($this->at(0))
+            ->method('isDayOff')
+            ->will($this->returnValue(false));
+        $this->holidays->expects($this->at(1))
+            ->method('isDayOff')
+            ->will($this->returnValue(true));
+
+        $visitDate = new \DateTime();
+        $visitDate->add(\DateInterval::createFromDateString('-20day'));
+        try {
+            $this->dataValidator->controlDateValidity($visitDate);
+            $this->fail('Must throw an Exception');
+        } catch (HttpException $e) {
+            $this->assertEquals('409', $e->getStatusCode());
+            $this->assertStringStartsWith('The date is not valid', $e->getMessage());
+        }
+
+        try {
+            $this->dataValidator->controlDateValidity($visitDate);
+            $this->fail('Must throw an Exception');
+        } catch (HttpException $e) {
+            $this->assertEquals('409', $e->getStatusCode());
+            $this->assertStringStartsWith('The date is not valid', $e->getMessage());
+        }
     }
 
     public function testControlTicketType()
     {
-
+        $visitDate = new \DateTime();
+        $actualHour = date('H');
+        try {
+            $this->dataValidator->controlTicketType('DEMI_JOURNEE', $visitDate);
+            if ($actualHour>'17') {
+                $this->fail('after 18h, You are not able to order a ticket for the actual day');
+            }
+        } catch (HttpException $e) {
+            if ($actualHour<'18') {
+                $this->fail('until 18h, You are able to order a DEMI_JOURNEE ticket for the actual day');
+            } else {
+                $this->assertEquals('409', $e->getStatusCode());
+                $this->assertEquals('The order of the ticket for the actual day is not permitted', $e->getMessage());
+            }
+        }
+        try {
+            $this->dataValidator->controlTicketType('JOURNEE', $visitDate);
+            if ($actualHour>'13') {
+                $this->fail('after 14h, You are not able to order a JOURNEE ticket for the actual day');
+            }
+        } catch (HttpException $e) {
+            if ($actualHour<'14') {
+                $this->fail('until 14h, You are able to order a JOURNEE ticket for the actual day');
+            } else {
+                $this->assertEquals('409', $e->getStatusCode());
+                $this->assertEquals('The order of the ticket for the actual day is not permitted', $e->getMessage());
+            }
+        }
+        $visitDate->setDate(2030, 5, 2);
+        try {
+            $this->dataValidator->controlTicketType('JOURNEE', $visitDate);
+            $this->dataValidator->controlTicketType('DEMI_JOURNEE', $visitDate);
+        } catch (HttpException $e) {
+            $this->fail('the method do not have to throw an exception for the JOURNEE and DEMI_JOURNEE Types');
+        }
+        try {
+            $this->dataValidator->controlTicketType('AUTRE_TYPE', $visitDate);
+            $this->fail('the method must throw an exception for a type different of JOURNEE and DEMI_JOURNEE');
+        } catch (HttpException $e) {
+            $this->assertEquals('400', $e->getStatusCode());
+            $this->assertEquals('The type of ticket is not correct', $e->getMessage());
+        }
     }
 
     public function testControlVisitorData()
@@ -230,7 +345,7 @@ class DataValidatorTest extends \PHPUnit_Framework_TestCase
         }
     }
 
-    public function testValidateTicketDetail()
+    public function testGetTicketDetail()
     {
         $ticketsDetail = new TicketDetail();
 
@@ -251,7 +366,7 @@ class DataValidatorTest extends \PHPUnit_Framework_TestCase
 
         try {
             $this->assertTrue(
-                $this->dataValidator->validateTicketDetail(1)
+                $this->dataValidator->getTicketDetail(1)
                 instanceof TicketDetail
             );
         } catch (HttpException $e) {
@@ -259,7 +374,7 @@ class DataValidatorTest extends \PHPUnit_Framework_TestCase
         }
 
         try {
-            $result = $this->dataValidator->validateTicketDetail(1);
+            $result = $this->dataValidator->getTicketDetail(1);
             $this->fail('Must throw an exception');
         } catch (HttpException $e) {
             $this->assertEquals(400, $e->getStatusCode());

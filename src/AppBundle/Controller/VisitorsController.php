@@ -8,8 +8,6 @@
 
 namespace AppBundle\Controller;
 
-use AppBundle\Entity\TicketDetail;
-use AppBundle\Entity\TicketsOrder;
 use AppBundle\Entity\Visitor;
 use FOS\RestBundle\Controller\Annotations\Post;
 use FOS\RestBundle\Controller\Annotations\Put;
@@ -49,7 +47,7 @@ class VisitorsController extends FOSRestController
         $validator = $this->get('app.validator');
 
         $visitorData = $validator->getVisitorData($visitorDataBeforeCheck);
-        $ticketDetail = $validator->validateTicketDetail($ticketDetailId);
+        $ticketDetail = $validator->getTicketDetail($ticketDetailId);
         $order = $validator->validateOrder($orderRef, $ticketDetail);
 
         $visitor = $ticketDetail->getVisitor();
@@ -88,7 +86,7 @@ class VisitorsController extends FOSRestController
         $validator = $this->get('app.validator');
 
         $visitorData = $validator->getVisitorData($content);
-        $ticketDetail = $validator->validateTicketDetail($ticketDetailId);
+        $ticketDetail = $validator->getTicketDetail($ticketDetailId);
         $order = $validator->validateOrder($orderRef, $ticketDetail);
 
         $visitor = $ticketDetail->getVisitor();
@@ -105,10 +103,10 @@ class VisitorsController extends FOSRestController
     }
 
     /**
-     * @param $visitor
+     * @param Visitor $visitor
      * @param $visitorData
      */
-    private function updateVisitor($visitor, $visitorData)
+    private function updateVisitor(Visitor $visitor, $visitorData)
     {
         $visitor->setLastName($visitorData['lastName']);
         $visitor->setFirstName($visitorData['firstName']);

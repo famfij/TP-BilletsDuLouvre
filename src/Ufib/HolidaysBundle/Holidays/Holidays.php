@@ -19,9 +19,9 @@ class Holidays
      * @param DateTime $day
      * @return bool
      */
-    public function isNotWorkedDay(DateTime $day)
+    public function isDayOff(DateTime $day)
     {
-       return $this->isWeekend($day) || $this->isDayOff($day);
+       return $this->isWeekend($day) || $this->isPublicHoliday($day);
     }
 
     /**
@@ -39,7 +39,7 @@ class Holidays
      * @param DateTime $day
      * @return bool
      */
-    protected function isDayOff(DateTime $day)
+    protected function isPublicHoliday(DateTime $day)
     {
        return $this->isEasterMondayDate($day)
             || $this->isAscensionDate($day)
@@ -79,19 +79,20 @@ class Holidays
 
     /**
      * @param DateTime $day
+     * @return bool
      */
     protected function isFixedHolidays(DateTime $day)
     {
-        $isDayOff = false;
+        $isPublicHoliday = false;
         $extractedMonthAndDay = $day->format('m-d');
         foreach ($this->fixedHolidays as $monthAndDay) {
             if ($monthAndDay == $extractedMonthAndDay) {
-                $isDayOff = true;
+                $isPublicHoliday = true;
                 break;
             }
         }
 
-        return $isDayOff;
+        return $isPublicHoliday;
     }
 
     /**

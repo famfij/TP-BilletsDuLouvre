@@ -53,7 +53,7 @@ class HolidaysTest extends \PHPUnit_Framework_TestCase
         $testedDate = new \DateTime();
         foreach ($testedValues as $record) {
             $testedDate->setDate($record['year'], $record['month'], $record['day']);
-            $this->assertEquals($record['result'], self::$holidays->isNotWorkedDay($testedDate));
+            $this->assertEquals($record['result'], self::$holidays->isDayOff($testedDate));
         }
     }
 

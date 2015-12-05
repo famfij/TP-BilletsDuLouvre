@@ -1,4 +1,4 @@
 services:
-#    ufib_holidays.example:
-#        class: Ufib\HolidaysBundle\Example
-#        arguments: [@service_id, "plain_value", %parameter%]
+    ufib_holidays.holidays:
+        class: Ufib\HolidaysBundle\Holidays\Holidays
+

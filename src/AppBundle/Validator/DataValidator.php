@@ -12,28 +12,55 @@ namespace AppBundle\Validator;
 use AppBundle\Entity\TicketDetail;
 use AppBundle\Entity\TicketsOrder;
 use Doctrine\Common\Persistence\ObjectManager;
-use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpKernel\Exception\HttpException;
+use Ufib\HolidaysBundle\Holidays\Holidays;
 
 class DataValidator
 {
     private $entityManager;
+    private $holidays;
 
-    public function __construct(ObjectManager $entityManager)
+    public function __construct(ObjectManager $entityManager, Holidays $holidays)
     {
         $this->entityManager = $entityManager;
+        $this->holidays = $holidays;
     }
 
+    /**
+     * @param \DateTime $visitDate
+     * @throws HttpException if the date is not valid
+     */
     public function controlDateValidity(\DateTime $visitDate)
     {
-        //TODO Check dayOff , weekend and past date
+        if ($this->holidays->isDayOff($visitDate) || $visitDate->format('Ymd')<date('Ymd')) {
+            throw new HttpException('409', 'The date is not valid');
+        }
     }
 
+    /**
+     * @param $visitDuration
+     * @param \DateTime $visitDate
+     * @throws HttpException if the ticket Type can't be order
+     */
     public function controlTicketType($visitDuration, \DateTime $visitDate)
     {
-        //TODO If date is today, check hour and the Day ticket
+        if ($visitDuration <> 'JOURNEE' && $visitDuration <> 'DEMI_JOURNEE') {
+            throw new httpException('400', 'The type of ticket is not correct');
+        }
+        If ($visitDate->format('Ymd') == date('Ymd')) {
+            $hour = date('H');
+            if (($visitDuration == 'JOURNEE' && $hour>13) || ($visitDuration == 'DEMI_JOURNEE' && $hour>17)) {
+                throw new HttpException('409', 'The order of the ticket for the actual day is not permitted');
+            }
+        }
     }
 
+    /**
+     * @param TicketsOrder $order
+     * @param TicketDetail $ticketDetail
+     * @param $visitorData
+     * @throws HttpException if the visitor age is not according with the ticket
+     */
     public function controlVisitorData(TicketsOrder $order, TicketDetail $ticketDetail, $visitorData)
     {
         $visitDate = $order->getVisitDate();
@@ -48,6 +75,12 @@ class DataValidator
         }
     }
 
+    /**
+     * format the data of a visitor
+     * @param $visitorToCheck
+     * @return array
+     * @throws HttpException if some data are incorrect
+     */
     public function getVisitorData($visitorToCheck)
     {
         $fields = array(
@@ -75,6 +108,12 @@ class DataValidator
         return $visitorData;
     }
 
+    /**
+     * get the order data from the content of a request
+     * @param $contentOrder
+     * @return array
+     * @throws HttpException if the data are not correct
+     */
     public function getOrderData($contentOrder)
     {
         $fields = array(
@@ -98,6 +137,13 @@ class DataValidator
         );
     }
 
+    /**
+     * Finalized an order
+     * @param $orderRef
+     * @param $ticketDetail
+     * @return mixed
+     * @throws HttpException if the order is not found
+     */
     public function validateOrder($orderRef, $ticketDetail)
     {
         $order = $this->entityManager->getRepository('AppBundle:TicketsOrder')
@@ -109,7 +155,13 @@ class DataValidator
         return $order;
     }
 
-    public function validateTicketDetail($ticketDetailId)
+    /**
+     * get the TicketDetail by it's id
+     * @param $ticketDetailId
+     * @return TicketDetail|object
+     * @throws HttpException if the order or the ticket do not exist
+     */
+    public function getTicketDetail($ticketDetailId)
     {
         $ticketDetail = $this->entityManager->getRepository('AppBundle:TicketDetail')
             ->find($ticketDetailId);

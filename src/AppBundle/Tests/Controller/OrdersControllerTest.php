@@ -11,7 +11,6 @@ namespace AppBundle\Tests\Controller;
 use AppBundle\Entity\TicketsOrder;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
-use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Client;
 
 class OrdersControllerTest extends WebTestCase
@@ -57,7 +56,7 @@ class OrdersControllerTest extends WebTestCase
      */
     public function testPostOrder()
     {
-        $this->sendRequest('POST', '/api/v1/order', array('visit_date' => '2015-12-25', 'visit_duration' => 'DEMI_JOURNEE'));
+        $this->sendRequest('POST', '/api/v1/order', array('visit_date' => '2031-02-14', 'visit_duration' => 'DEMI_JOURNEE'));
 
         $this->assertEquals(200, $this->client->getResponse()->getStatusCode());
 
@@ -81,7 +80,7 @@ class OrdersControllerTest extends WebTestCase
 
         $updatedOrder = array(
             'ref' => 'AZERTy1234AZE123',
-            'visit_date' => '2015-12-24',
+            'visit_date' => '2031-03-13',
             'visit_duration' => 'JOURNEE'
         );
 
@@ -192,7 +191,7 @@ class OrdersControllerTest extends WebTestCase
     {
         $order = new TicketsOrder();
         $order->setRef('AZERTY1234AZE123');
-        $order->setVisitDate(new \DateTime('2015-11-13'));
+        $order->setVisitDate(new \DateTime('2031-04-17'));
         $order->setVisitDuration('DEMI_JOURNEE');
         $this->entityManager->persist($order);
         $this->entityManager->flush();
@@ -269,7 +268,7 @@ class OrdersControllerTest extends WebTestCase
     private function controlPostResponseContent($response)
     {
         $this->assertObjectHasAttribute('visit_date', $response);
-        $this->assertEquals(new \DateTime('2015-12-25'), new \DateTime($response->visit_date));
+        $this->assertEquals(new \DateTime('2031-02-14'), new \DateTime($response->visit_date));
 
         $this->assertObjectHasAttribute('visit_duration', $response);
         $this->assertEquals('DEMI_JOURNEE', $response->visit_duration);
@@ -289,7 +288,7 @@ class OrdersControllerTest extends WebTestCase
     public function controlPostOrderEntity(TicketsOrder $orderEntity)
     {
         $this->assertNotNull($orderEntity);
-        $this->assertEquals(new \DateTime('2015-12-25'), $orderEntity->getVisitDate());
+        $this->assertEquals(new \DateTime('2031-02-14'), $orderEntity->getVisitDate());
         $this->assertEquals('DEMI_JOURNEE', $orderEntity->getVisitDuration());
         $this->assertFalse($orderEntity->isValidate());
     }
