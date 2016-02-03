@@ -1,4 +1,0 @@
-services:
-    ufib_holidays.holidays:
-        class: Ufib\HolidaysBundle\Holidays\Holidays
-

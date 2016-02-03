@@ -10,4 +10,4 @@ services:
 
 imports:
     - { resource: "@AppBundle/Resources/config/services.yml" }
-    - { resource: "@UfibHolidaysBundle/Resources/config/services.yml" }
+    - { resource: "@JFRPIHolidaysBundle/Resources/config/services.yml" }

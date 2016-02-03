@@ -22,7 +22,10 @@
         "tecnickcom/tcpdf": "6.2.*",
         "friendsofsymfony/rest-bundle": "1.7.2",
         "jms/serializer-bundle": "1.1.0",
-        "nelmio/api-doc-bundle": "2.10.3"
+        "nelmio/api-doc-bundle": "2.10.3",
+        "payum/paypal-express-checkout-nvp": "^1.0",
+        "payum/payum-bundle": "^1.0",
+        "payum/stripe": "^1.0"
     },
     "require-dev": {
         "sensio/generator-bundle": "~2.3",

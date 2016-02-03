@@ -1,0 +1,4 @@
+services:
+    jfrpi_holidays.holidays:
+        class: JFRPI\HolidaysBundle\Holidays\Holidays
+

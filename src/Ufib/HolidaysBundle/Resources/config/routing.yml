@@ -1,3 +1,0 @@
-ufib_holidays_homepage:
-    path:     /hello/{name}
-    defaults: { _controller: UfibHolidaysBundle:Default:index }

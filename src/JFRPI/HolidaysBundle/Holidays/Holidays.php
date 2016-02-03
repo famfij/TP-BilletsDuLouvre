@@ -6,7 +6,7 @@
  * Time: 10:55
  */
 
-namespace Ufib\HolidaysBundle\Holidays;
+namespace JFRPI\HolidaysBundle\Holidays;
 
 
 use DateTime;

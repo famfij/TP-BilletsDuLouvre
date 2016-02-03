@@ -22,7 +22,8 @@ class AppKernel extends Kernel
             new Nelmio\ApiDocBundle\NelmioApiDocBundle(),
             new AppBundle\AppBundle(),
             new Frj\CalendarBundle\FrjCalendarBundle(),
-            new Ufib\HolidaysBundle\UfibHolidaysBundle(),
+            new JFRPI\HolidaysBundle\JFRPIHolidaysBundle(),
+            new Payum\Bundle\PayumBundle\PayumBundle(),
         );
 
         if (in_array($this->getEnvironment(), array('dev', 'test'))) {

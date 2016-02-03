@@ -6,10 +6,10 @@
  * Time: 10:56
  */
 
-namespace Ufib\HolidaysBundle\Tests\Holidays;
+namespace JFRPI\HolidaysBundle\Tests\Holidays;
 
 
-use Ufib\HolidaysBundle\Holidays\Holidays;
+use JFRPI\HolidaysBundle\Holidays\Holidays;
 
 class HolidaysTest extends \PHPUnit_Framework_TestCase
 {

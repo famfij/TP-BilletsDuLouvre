@@ -1,0 +1,3 @@
+jfrpi_holidays_homepage:
+    path:     /hello/{name}
+    defaults: { _controller: JFRPIHolidaysBundle:Default:index }

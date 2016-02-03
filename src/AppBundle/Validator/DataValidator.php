@@ -13,7 +13,7 @@ use AppBundle\Entity\TicketDetail;
 use AppBundle\Entity\TicketsOrder;
 use Doctrine\Common\Persistence\ObjectManager;
 use Symfony\Component\HttpKernel\Exception\HttpException;
-use Ufib\HolidaysBundle\Holidays\Holidays;
+use JFRPI\HolidaysBundle\Holidays\Holidays;
 
 class DataValidator
 {

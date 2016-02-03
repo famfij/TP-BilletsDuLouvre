@@ -101,3 +101,21 @@ fos_rest:
         failed_validation: HTTP_BAD_REQUEST
 
 nelmio_api_doc: ~
+
+payum:
+    security:
+        token_storage:
+            JFRPI\PaymentBundle\Entity\PaymentToken: {doctrine: orm}
+    storages:
+        JFRPI\PaymentBundle\Entity\Payment: {doctrine: orm}
+    gateways:
+        paypal:
+            paypal_express_checkout_nvp:
+                username: friryj-facilitator_api1.gmail.com
+                password: 5RAL4WHN9PAQ7UF7
+                signature: AFcWxV21C7fd0v3bYYYRCpSSRl31Af4FmMvmUg5r3IycbYTu0gOcJsCh
+                sandbox: true
+        stripe:
+            stripe_checkout:
+                publishable_key: pk_test_drWpxtBRUBYJ2tKDs6bp9EgM
+                secret_key: sk_test_ogpduJvn4LpmxG9njCZu9Cc9
