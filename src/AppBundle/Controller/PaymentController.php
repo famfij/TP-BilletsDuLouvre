@@ -26,39 +26,7 @@ class PaymentController extends FOSRestController
      */
     public function preparePaypalPaymentAction(ParamFetcher $paramFetcher)
     {
-        $orderId = intval($paramFetcher->get('id'));
-        $ref = strtoupper($paramFetcher->get('ref'));
-        $mail = strtolower($paramFetcher->get('mail'));
-
-        $paymentOrderInformation = $this->get('app.payment_information');
-
-        if ($paymentOrderInformation->isPayedOrder($orderId, $ref)) {
-            throw new HttpException('400', 'the order is already payed');
-        }
-
-        $totalAmount = $paymentOrderInformation->getOrderTotalAmount($orderId, $ref);
-        $paymentOrderInformation->setOrderMail($orderId, $ref, $mail);
-
-        $gatewayName = 'Paypal';
-
-        $storage = $this->get('payum')->getStorage('AppBundle\Entity\Payment');
-
-        $payment = $storage->create();
-        $payment->setNumber(uniqid());
-        $payment->setCurrencyCode('EUR');
-        $payment->setTotalAmount($totalAmount);
-        $payment->setDescription('Commande Billets du Louvre');
-        $payment->setOrderId($orderId);
-
-        $storage->update($payment);
-
-        $captureToken = $this->get('payum.security.token_factory')->createCaptureToken(
-            $gatewayName,
-            $payment,
-            'app_payment_done'
-        );
-
-        return $this->redirect($captureToken->getTargetUrl());
+        return $this->preparePayment($paramFetcher, 'Paypal');
     }
 
     /**
@@ -70,39 +38,7 @@ class PaymentController extends FOSRestController
      */
     public function prepareStripePaymentAction(ParamFetcher $paramFetcher)
     {
-        $orderId = intval($paramFetcher->get('id'));
-        $ref = strtoupper($paramFetcher->get('ref'));
-        $mail = strtolower($paramFetcher->get('mail'));
-
-        $paymentOrderInformation = $this->get('app.payment_information');
-
-        if ($paymentOrderInformation->isPayedOrder($orderId, $ref)) {
-            throw new HttpException('400', 'the order is already payed');
-        }
-
-        $totalAmount = $paymentOrderInformation->getOrderTotalAmount($orderId, $ref);
-        $paymentOrderInformation->setOrderMail($orderId, $ref, $mail);
-
-        $gatewayName = 'Stripe';
-
-        $storage = $this->get('payum')->getStorage('AppBundle\Entity\Payment');
-
-        $payment = $storage->create();
-        $payment->setNumber(uniqid());
-        $payment->setCurrencyCode('EUR');
-        $payment->setTotalAmount($totalAmount);
-        $payment->setDescription('Commande Billets du Louvre');
-        $payment->setOrderId($orderId);
-
-        $storage->update($payment);
-
-        $captureToken = $this->get('payum.security.token_factory')->createCaptureToken(
-            $gatewayName,
-            $payment,
-            'app_payment_done'
-        );
-
-        return $this->redirect($captureToken->getTargetUrl());
+        return $this->preparePayment($paramFetcher, 'Stripe');
     }
 
     /**
@@ -155,5 +91,45 @@ class PaymentController extends FOSRestController
             'mailSent'       => $mailSent,
             'order'          => $order,
         );
+    }
+
+    /**
+     * @param ParamFetcher $paramFetcher
+     * @param string $gatewayName
+     * @return \Symfony\Component\HttpFoundation\RedirectResponse
+     */
+    private function preparePayment(ParamFetcher $paramFetcher, $gatewayName)
+    {
+        $orderId = intval($paramFetcher->get('id'));
+        $ref = strtoupper($paramFetcher->get('ref'));
+        $mail = strtolower($paramFetcher->get('mail'));
+
+        $paymentOrderInformation = $this->get('app.payment_information');
+
+        if ($paymentOrderInformation->isPayedOrder($orderId, $ref)) {
+            throw new HttpException('400', 'the order is already payed');
+        }
+
+        $totalAmount = $paymentOrderInformation->getOrderTotalAmount($orderId, $ref);
+        $paymentOrderInformation->setOrderMail($orderId, $ref, $mail);
+
+        $storage = $this->get('payum')->getStorage('AppBundle\Entity\Payment');
+
+        $payment = $storage->create();
+        $payment->setNumber(uniqid());
+        $payment->setCurrencyCode('EUR');
+        $payment->setTotalAmount($totalAmount);
+        $payment->setDescription('Commande Billets du Louvre');
+        $payment->setOrderId($orderId);
+
+        $storage->update($payment);
+
+        $captureToken = $this->get('payum.security.token_factory')->createCaptureToken(
+            $gatewayName,
+            $payment,
+            'app_payment_done'
+        );
+
+        return $this->redirect($captureToken->getTargetUrl());
     }
 }

@@ -1,0 +1,7 @@
+<table cellspacing="0" cellpadding="0" border="0">
+    <tr><td colspan="2"><h1>Billet du Louvre <small>Pour le {{ visit_date }} / {{ visit_duration }}</small></h1></td></tr>
+    <tr><td colspan="2"><img src="{{ absolute_url(asset("images/logo-louvre.jpg")) }}" width="300" height="118"></td></tr>
+    <tr><td width="500px">Billet {{ ticket_name }}: {{  price }} €<br/><small><span style="text-decoration: underline">Visiteur(s):</span></small></td>
+        <td align="center" width="170px">Code de réservation:<br/>{{ code }}</td></tr>
+    <tr><td colspan="2">{% for detail in details %}{{ detail.visitor.lastName }} {{ detail.visitor.firstName }}<br/>{% endfor %}</td></tr>
+</table><hr>

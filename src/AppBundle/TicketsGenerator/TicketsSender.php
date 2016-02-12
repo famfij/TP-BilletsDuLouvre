@@ -26,6 +26,14 @@ class TicketsSender
     public function sendTickets(TicketsOrder $order)
     {
         $data = $this->ticketsBuilder->getPdfFileData($order);
+
+        $message = $this->getMessage($order, $data);
+
+        $this->mailer->send($message);
+    }
+
+    public function getMessage(TicketsOrder $order, $data)
+    {
         $attachement = \Swift_Attachment::newInstance($data, 'billets.pdf', 'application/pdf');
 
         $message = \Swift_Message::newInstance()
@@ -35,6 +43,6 @@ class TicketsSender
             ->setBody('<p>Bonjour,</p><p>Voici vos billets</p>', 'text/html')
             ->attach($attachement);
 
-        $this->mailer->send($message);
+        return $message;
     }
 }

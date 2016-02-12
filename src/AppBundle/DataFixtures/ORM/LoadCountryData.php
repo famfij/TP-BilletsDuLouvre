@@ -6,7 +6,7 @@
  * Time: 23:35
  */
 
-namespace AppBundle\Tests\DataFixtures;
+namespace AppBundle\DataFixtures\ORM;
 
 use AppBundle\Entity\Country;
 use Doctrine\Common\DataFixtures\AbstractFixture;
