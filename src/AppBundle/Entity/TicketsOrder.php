@@ -50,6 +50,13 @@ class TicketsOrder
     private $validate;
 
     /**
+     * @var string
+     *
+     * @ORM\Column(name="mail", type="string", length=100, nullable=true)
+     */
+    private $mail;
+
+    /**
      * @ORM\OneToMany(targetEntity="Ticket", mappedBy="ticketsOrder", cascade={"persist", "remove", "merge"})
      */
     private $tickets;
@@ -166,6 +173,22 @@ class TicketsOrder
     public function isValidate()
     {
         return $this->validate;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getMail()
+    {
+        return $this->mail;
+    }
+
+    /**
+     * @param string|null $mail
+     */
+    public function setMail($mail)
+    {
+        $this->mail = $mail;
     }
 
     /**

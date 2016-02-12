@@ -26,4 +26,28 @@ class Payment extends BasePayment
      * @var integer $id
      */
     protected $id;
+
+    /**
+     * @ORM\Column(name="order_id", type="integer", nullable=false)
+     */
+    protected $orderId;
+
+    /**
+     * @return mixed
+     */
+    public function getOrderId()
+    {
+        return $this->orderId;
+    }
+
+    /**
+     * @param mixed $orderId
+     */
+    public function setOrderId($orderId)
+    {
+        $this->orderId = $orderId;
+    }
+
+
+
 }

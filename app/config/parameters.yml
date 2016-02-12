@@ -7,6 +7,6 @@ parameters:
     database_password: mdp_Louvre
     mailer_transport: smtp
     mailer_host: mail.infomaniak.ch
-    mailer_user: webmaster@famfij.net
+    mailer_user: webmaster@jfr-pi.fr
     mailer_password: 1pfwma
     secret: d3044913a7afa11088b2f78098ed45dbd

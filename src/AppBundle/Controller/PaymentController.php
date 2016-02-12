@@ -2,69 +2,115 @@
 
 namespace AppBundle\Controller;
 
+use AppBundle\Entity\TicketsOrder;
+use FOS\RestBundle\Controller\Annotations\Post;
+use FOS\RestBundle\Controller\Annotations\RequestParam;
+use FOS\RestBundle\Controller\Annotations\Route;
+use FOS\RestBundle\Controller\Annotations\View;
 use FOS\RestBundle\Controller\FOSRestController;
+use FOS\RestBundle\Request\ParamFetcher;
 use Payum\Core\Request\GetHumanStatus;
+use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpKernel\Exception\HttpException;
 
 class PaymentController extends FOSRestController
 {
-    /*
+    /**
      * @Post("/api/v1/payment/paypal.{_format}", requirements={"_format"="json, xml"}, name="post_payment_paypal", defaults={"_format"="json"})
-     * @RequestParam(name="order_id", requirements="\d+", description="id of the order to pay")
-     * @RequestParam(name="order_ref", requirements="[0-9A-Za-z]{16}", description="ref of the order to pay")
-     * @ApiDoc(description="ask to pay with Paypal the order passed in param")
+     * @RequestParam(name="id", requirements="\d+", description="id of the order to pay")
+     * @RequestParam(name="ref", requirements="[0-9A-Za-z]{16}", description="ref of the order to pay")
+     * @RequestParam(name="mail", requirements="[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+", description="email of the client, used to send the tickets")
+     * @ApiDoc(description="ask to pay with paypal the order passed in param")
+     * @return \Symfony\Component\HttpFoundation\RedirectResponse
      */
-    public function preparePaypalPaymentAction()
+    public function preparePaypalPaymentAction(ParamFetcher $paramFetcher)
     {
+        $orderId = intval($paramFetcher->get('id'));
+        $ref = strtoupper($paramFetcher->get('ref'));
+        $mail = strtolower($paramFetcher->get('mail'));
+
+        $paymentOrderInformation = $this->get('app.payment_information');
+
+        if ($paymentOrderInformation->isPayedOrder($orderId, $ref)) {
+            throw new HttpException('400', 'the order is already payed');
+        }
+
+        $totalAmount = $paymentOrderInformation->getOrderTotalAmount($orderId, $ref);
+        $paymentOrderInformation->setOrderMail($orderId, $ref, $mail);
+
         $gatewayName = 'Paypal';
 
-        $storage = $this->get('payum')->getStorage('JFRPI\PaymentBundle\Entity\Payment');
+        $storage = $this->get('payum')->getStorage('AppBundle\Entity\Payment');
 
         $payment = $storage->create();
         $payment->setNumber(uniqid());
-        $payment['PAYMENTREQUEST_0_CURRENCYCODE'] = 'EUR';
-        $payment['PAYMENTREQUEST_0_AMT'] = 1;
+        $payment->setCurrencyCode('EUR');
+        $payment->setTotalAmount($totalAmount);
+        $payment->setDescription('Commande Billets du Louvre');
+        $payment->setOrderId($orderId);
 
         $storage->update($payment);
 
         $captureToken = $this->get('payum.security.token_factory')->createCaptureToken(
             $gatewayName,
             $payment,
-            'jfrpi_payment_done'
+            'app_payment_done'
         );
 
         return $this->redirect($captureToken->getTargetUrl());
     }
 
-    /*
-     * @Post("/api/v1/payment/stripe.{_format}", requirements={"_format"="json, xml"}, name="post_payment_paypal", defaults={"_format"="json"})
-     * @RequestParam(name="order_id", requirements="\d+", description="id of the order to pay")
-     * @RequestParam(name="order_ref", requirements="[0-9A-Za-z]{16}", description="ref of the order to pay")
+    /**
+     * @Post("/api/v1/payment/stripe.{_format}", requirements={"_format"="json, xml"}, name="post_payment_stripe", defaults={"_format"="json"})
+     * @RequestParam(name="id", requirements="\d+", description="id of the order to pay")
+     * @RequestParam(name="ref", requirements="[0-9A-Za-z]{16}", description="ref of the order to pay")
+     * @RequestParam(name="mail", requirements="[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+", description="email of the client, used to send the tickets")
      * @ApiDoc(description="ask to pay with stripe the order passed in param")
      */
-    public function prepareStripePaymentAction()
+    public function prepareStripePaymentAction(ParamFetcher $paramFetcher)
     {
+        $orderId = intval($paramFetcher->get('id'));
+        $ref = strtoupper($paramFetcher->get('ref'));
+        $mail = strtolower($paramFetcher->get('mail'));
+
+        $paymentOrderInformation = $this->get('app.payment_information');
+
+        if ($paymentOrderInformation->isPayedOrder($orderId, $ref)) {
+            throw new HttpException('400', 'the order is already payed');
+        }
+
+        $totalAmount = $paymentOrderInformation->getOrderTotalAmount($orderId, $ref);
+        $paymentOrderInformation->setOrderMail($orderId, $ref, $mail);
+
         $gatewayName = 'Stripe';
 
-        $storage = $this->get('payum')->getStorage('JFRPI\PaymentBundle\Entity\Payment');
+        $storage = $this->get('payum')->getStorage('AppBundle\Entity\Payment');
 
         $payment = $storage->create();
         $payment->setNumber(uniqid());
-        $payment['currency'] = 'EUR';
-        $payment['amount'] = 1;
-        $payment['description'] = 'Commande Billets du Louvre';
+        $payment->setCurrencyCode('EUR');
+        $payment->setTotalAmount($totalAmount);
+        $payment->setDescription('Commande Billets du Louvre');
+        $payment->setOrderId($orderId);
 
         $storage->update($payment);
 
         $captureToken = $this->get('payum.security.token_factory')->createCaptureToken(
             $gatewayName,
             $payment,
-            'jfrpi_payment_done'
+            'app_payment_done'
         );
 
         return $this->redirect($captureToken->getTargetUrl());
     }
 
+    /**
+     * @View()
+     * @Route("/payment/done", name="app_payment_done")
+     * @param Request $request
+     * @return JsonResponse
+     */
     public function paymentDoneAction(Request $request)
     {
         $token = $this->get('payum.security.http_request_verifier')->verify($request);
@@ -73,28 +119,41 @@ class PaymentController extends FOSRestController
         $model = $this->get('payum')->getStorage($identity->getClass())->find($identity);
 
         $gateway = $this->get('payum')->getGateway($token->getGatewayName());
-        
-        // Once you have token you can get the model from the storage directly.
-        //$identity = $token->getDetails();
-        //$details = $payum->getStorage($identity->getClass())->find($identity);
 
         // or Payum can fetch the model for you while executing a request (Preferred).
         $gateway->execute($status = new GetHumanStatus($token));
-        $details = $status->getFirstModel();
+        $payment = $status->getFirstModel();
 
-        // you have order and payment status
-        // so you can do whatever you want for example you can just print status and payment details.
+        $paymentSuccess = false;
+        $mailSent = false;
+        $order = null;
 
-        return new JsonResponse(array(
-            'status' => $status->getValue(),
-            'details' => iterator_to_array($details),
-        ));
-    }
+        if ($status->isAuthorized()) {
+            $entityManager = $this
+                ->getDoctrine()
+                ->getEntityManager();
 
-    public function getPaymentDetails($orderRef)
-    {
+            $order = $entityManager
+                ->getRepository('AppBundle:TicketsOrder')
+                ->find($payment->getOrderId());
+
+            $order->setValidate(true);
+            $entityManager->flush();
+
+            $ticketsSender = $this->get('app.tickets_sender');
+            try {
+                $ticketsSender->sendTickets($order);
+                $mailSent = true;
+            } catch (\Swift_TransportException $e) {
+                // the mail is not sent
+            }
+            $paymentSuccess = true;
+        }
+
         return array(
-
+            'paymentSuccess' => $paymentSuccess,
+            'mailSent'       => $mailSent,
+            'order'          => $order,
         );
     }
 }

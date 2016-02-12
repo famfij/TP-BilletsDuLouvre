@@ -7,3 +7,14 @@ services:
     app.validator:
         class: AppBundle\Validator\DataValidator
         arguments: ["@doctrine.orm.entity_manager", "@jfrpi_holidays.holidays"]
+
+    app.payment_information:
+        class: AppBundle\PaymentOrderInformation\PaymentOrderInformation
+        arguments: ["@doctrine.orm.entity_manager"]
+
+    app.tickets_builder:
+        class: AppBundle\TicketsGenerator\TicketsBuilder
+
+    app.tickets_sender:
+        class: AppBundle\TicketsGenerator\TicketsSender
+        arguments: ["@mailer", "@app.tickets_builder"]

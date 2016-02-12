@@ -105,9 +105,9 @@ nelmio_api_doc: ~
 payum:
     security:
         token_storage:
-            JFRPI\PaymentBundle\Entity\PaymentToken: {doctrine: orm}
+            AppBundle\Entity\PaymentToken: {doctrine: orm}
     storages:
-        JFRPI\PaymentBundle\Entity\Payment: {doctrine: orm}
+        AppBundle\Entity\Payment: {doctrine: orm}
     gateways:
         paypal:
             paypal_express_checkout_nvp:
