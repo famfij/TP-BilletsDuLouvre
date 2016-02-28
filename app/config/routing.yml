@@ -1,7 +1,3 @@
-frj_calendar:
-    resource: "@FrjCalendarBundle/Controller/"
-    prefix:   annotation
-
 app:
     resource: "@AppBundle/Controller/"
     type:     annotation

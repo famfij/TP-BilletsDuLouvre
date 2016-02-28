@@ -19,3 +19,7 @@ services:
     app.tickets_sender:
         class: AppBundle\TicketsGenerator\TicketsSender
         arguments: ["@mailer", "@app.tickets_builder"]
+
+    app.calendar_information:
+        class: AppBundle\CalendarInformation\CalendarInformation
+        arguments: ["@doctrine.orm.entity_manager"]

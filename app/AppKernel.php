@@ -21,7 +21,6 @@ class AppKernel extends Kernel
             new JMS\SerializerBundle\JMSSerializerBundle(),
             new Nelmio\ApiDocBundle\NelmioApiDocBundle(),
             new AppBundle\AppBundle(),
-            new Frj\CalendarBundle\FrjCalendarBundle(),
             new JFRPI\HolidaysBundle\JFRPIHolidaysBundle(),
             new Payum\Bundle\PayumBundle\PayumBundle(),
         );

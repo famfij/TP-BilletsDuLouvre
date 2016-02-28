@@ -25,7 +25,8 @@
         "nelmio/api-doc-bundle": "2.10.3",
         "payum/paypal-express-checkout-nvp": "^1.0",
         "payum/payum-bundle": "^1.0",
-        "payum/stripe": "^1.0"
+        "payum/stripe": "^1.0",
+        "beberlei/DoctrineExtensions": "^1.0"
     },
     "require-dev": {
         "sensio/generator-bundle": "~2.3",

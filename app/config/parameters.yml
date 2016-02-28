@@ -11,5 +11,4 @@ parameters:
     mailer_password: mailPwd
     mailer_port: 587
     auth_mode: plain
-
     secret: d3044913a7afa11088b2f78098ed45dbd

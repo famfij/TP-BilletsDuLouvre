@@ -22,4 +22,19 @@ class TicketsOrderRepository extends \Doctrine\ORM\EntityRepository
 
         return $queryBuilder->getQuery()->getOneOrNullResult();
     }
+
+    public function getMonthlyVisitors($year, $month)
+    {
+        $queryBuilder = $this->createQueryBuilder('o')
+            ->leftJoin('o.tickets','t')
+            ->leftJoin('t.ticketDetails', 'td')
+            ->select(array('DAY(o.visitDate) as day', 'COUNT(td) as quantity'))
+            ->where('MONTH(o.visitDate) = :month')
+            ->setParameter('month', $month)
+            ->andWhere('YEAR(o.visitDate) = :year')
+            ->setParameter('year', $year)
+            ->groupBy('day');
+
+        return $queryBuilder->getQuery()->getArrayResult();
+    }
 }

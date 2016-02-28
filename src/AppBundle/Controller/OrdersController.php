@@ -35,7 +35,6 @@ class OrdersController extends FOSRestController
      * @Get("/api/v1/order.{_format}", requirements={"_format"="json, xml"}, name="get_order", defaults={"_format"="json"})
      * @QueryParam(name="id", requirements="\d+", description="id of the order")
      * @QueryParam(name="ref", requirements="[0-9A-Za-z]{16}", description="ref of the order")
-     * @param int $orderId
      * @ApiDoc(description="Get all information of an order")
      */
     public function getOrderAction(ParamFetcher $paramFetcher)
@@ -81,7 +80,6 @@ class OrdersController extends FOSRestController
      * @RequestParam(name="ref", requirements="[0-9A-Za-z]{16}", description="ref of the order")
      * @RequestParam(name="visit_date", requirements="[0-9]{4}-[0-9]{2}-[0-9]{2}", description="date of the visit formatted as yyyy-mm-dd")
      * @RequestParam(name="visit_duration", requirements="(JOURNEE)|(DEMI_JOURNEE)", description="time of the visit (day or half day) : 'JOURNEE' or 'DEMI_JOURNEE'")
-     * @param int $orderId
      * @ApiDoc(description="update the params (date and duration of the visit) of an order that it's not finalized")
      */
     public function putOrderAction(ParamFetcher $paramFetcher, Request $request)
@@ -113,7 +111,6 @@ class OrdersController extends FOSRestController
      * @Delete("/api/v1/order.{_format}", requirements={"_format"="json, xml"}, name="delete_order", defaults={"_format"="json"})
      * @QueryParam(name="id", requirements="\d+", description="id of the order")
      * @QueryParam(name="ref", requirements="[0-9A-Za-z]+", description="ref of the order")
-     * @param int $orderId
      * @ApiDoc(description="delete an order that it's not finalized")
      */
     public function deleteOrderAction(ParamFetcher $paramFetcher)
